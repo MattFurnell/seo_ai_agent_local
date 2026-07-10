@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from google import genai
+from semrush_client import ask_semrush
 import os
 
 # Loads your local .env file when running on your laptop.
@@ -313,7 +314,7 @@ def home():
                 <span class="pill">Gemini: {gemini_status}</span>
                 <span class="pill">Semrush: {semrush_status}</span>
                 <span class="pill">Screaming Frog: {screaming_frog_status}</span>
-                <span class="pill">MCP Tools: Placeholder</span>
+                <span class="pill">Semrush MCP: Live when queried</span>
             </div>
 
             <div class="examples">
@@ -328,7 +329,7 @@ def home():
 
             <div id="chat">
                 <div class="message bot">
-                    Hello. Ask me an SEO question. If Gemini is connected, I will use Gemini to answer. MCP tools are still placeholders until the Semrush and Screaming Frog MCP servers are wired in.
+                    Hello. Ask me an SEO question. Semrush-related questions use the live Semrush MCP connection; other questions use Gemini directly.
                 </div>
             </div>
 
@@ -386,6 +387,31 @@ def home():
 
 
 @app.post("/chat")
-def chat(request: ChatRequest):
-    reply = ask_gemini(request.message)
+async def chat(request: ChatRequest):
+    message = request.message.strip()
+    message_lower = message.lower()
+
+    semrush_terms = [
+        "semrush",
+        "keyword",
+        "keywords",
+        "ranking",
+        "rankings",
+        "search volume",
+        "keyword difficulty",
+        "competitor",
+        "competitors",
+        "organic search",
+        "backlink",
+        "backlinks",
+        "domain overview",
+        "traffic estimate",
+        "content gap",
+    ]
+
+    if SEMRUSH_API_KEY and any(term in message_lower for term in semrush_terms):
+        reply = await ask_semrush(message)
+    else:
+        reply = ask_gemini(message)
+
     return {"reply": reply}
