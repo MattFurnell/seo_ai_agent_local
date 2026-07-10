@@ -12,7 +12,7 @@ load_dotenv()
 app = FastAPI(title="SEO Intelligence Agent - Howden C&LC website")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.0-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
 
 SEMRUSH_API_KEY = os.getenv("SEMRUSH_API_KEY")
 SCREAMING_FROG_API_KEY = os.getenv("SCREAMING_FROG_API_KEY")
