@@ -1,4 +1,5 @@
 import asyncio
+import json
 import os
 
 from dotenv import load_dotenv
@@ -11,7 +12,8 @@ SCREAMING_FROG_MCP_URL = os.getenv("SCREAMING_FROG_MCP_URL")
 
 
 async def main():
-    print("Screaming Frog URL:", SCREAMING_FROG_MCP_URL)
+
+    print("Connecting to:", SCREAMING_FROG_MCP_URL)
 
     async with streamablehttp_client(
         SCREAMING_FROG_MCP_URL
@@ -23,13 +25,32 @@ async def main():
         ) as session:
 
             await session.initialize()
+
             tools = await session.list_tools()
 
-            print("\n✅ Connected to Screaming Frog MCP")
-            print("\nAvailable tools:")
+            print("\n✅ Connected!\n")
+            print("Available tools:\n")
 
             for tool in tools.tools:
-                print(f"- {tool.name}: {tool.description}")
+                print(f"- {tool.name}")
+
+            print("\n")
+
+            tool_name = input("Enter the tool name exactly as shown above: ")
+
+            print("\nCalling tool...\n")
+
+            result = await session.call_tool(
+                tool_name,
+                arguments={}
+            )
+
+            print("---------------")
+            print("RAW RESPONSE")
+            print("---------------")
+            print(result)
+
+            print("\nFinished.")
 
 
 if __name__ == "__main__":
